@@ -1,4 +1,4 @@
 occipital
 =========
 
-Wrapper for image processing utilities, including imagemagick.
+Nodejs wrapper for image processing utilities, including imagemagick.
