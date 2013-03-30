@@ -1,7 +1,7 @@
 var occ = require('../occipital.js');
-// occ.utilityWrapper = 'vips';
+var lobe = new occ.Lobe({'utilityWrapper':'imagemagick'});
 
-occ.process('./input.png', './output.png',
+lobe.process('./input.png', './output.png',
     {
         outputOptions : [
             { fill     : '"#00fdff"' },
