@@ -2,6 +2,7 @@
     "name"         : "occipital",
     "description"  : "Wrapper for image processing utilities, including imagemagick.",
     "version"      : "0.0.1",
+    "main"         : "./occipital",
     "private"      : true,
     "dependencies" : {
         "neon" : "1.x"
