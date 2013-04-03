@@ -24,7 +24,7 @@ var ImagemagickWrapper = {};
  *       context   : [Object] // Context on which to execute the callbacks.
  *   }
  */
-ImagemagickWrapper.process = function (inputFile, outputFile, options){
+ImagemagickWrapper.process = function process (inputFile, outputFile, options){
     var key, option, result, i;
     var inputOptions = '', outputOptions = '';
 
@@ -41,7 +41,6 @@ ImagemagickWrapper.process = function (inputFile, outputFile, options){
     }
 
     // Execute imagemagick's convert command.
-    console.time('process');
     exec('convert ' + inputOptions + ' ' + inputFile + ' ' + outputOptions + ' ' + outputFile, function (error, stdout, stderr) {
         if (error !== null) {
             console.log('stdout: ' + stdout);
@@ -54,8 +53,35 @@ ImagemagickWrapper.process = function (inputFile, outputFile, options){
 
         // Execute onSuccess callback
         options.onSuccess.call( options.context, error, stdout, stderr );
-        console.timeEnd('process');
     });
-}
+};
+
+/*
+ * Process an Image Synchronously.
+ *
+ * Parameters: Same as process.
+ */
+ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, options){
+    var key, option, result, i;
+    var inputOptions = '', outputOptions = '';
+    var FFI = require("node-ffi");
+    var libc = new FFI.Library(null, {
+          "system": ["int32", ["string"]]
+    });
+    var execSync = libc.system;
+
+    // Convert json options to command line options.
+    for (i=0; i < options.outputOptions.length; i+=1) {
+        option = options.outputOptions[i];
+        key = Object.keys(option)[0];
+
+        // Construct command line options.
+        outputOptions += ' -' + key + ' ' + option[key];
+    }
+
+    // Execute imagemagick's convert command.
+    return execSync('convert ' + inputOptions + ' ' + inputFile + ' ' + outputOptions + ' ' + outputFile);
+};
 
 exports.process = ImagemagickWrapper.process;
+exports.processSync = ImagemagickWrapper.processSync;

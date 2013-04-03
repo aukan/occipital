@@ -5,6 +5,7 @@
     "main"         : "./occipital",
     "private"      : true,
     "dependencies" : {
-        "neon" : "1.x"
+        "neon" : "1.x",
+        "node-ffi" : "0.5.7"
     }
 }

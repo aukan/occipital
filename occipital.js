@@ -50,6 +50,18 @@ Ne.Class(Occipital, 'Lobe')({
             utilityWrapper = require('./' + this.utilityWrapper + '_wrapper.js');
 
             utilityWrapper.process(inputFile, outputFile, options);
+        },
+
+        /*
+         * Synchronously Process an Image.
+         *
+         * Parameters are the same as process.
+         */
+        processSync : function (inputFile, outputFile, options){
+            var utilityWrapper;
+
+            utilityWrapper = require('./' + this.utilityWrapper + '_wrapper.js');
+            return utilityWrapper.processSync(inputFile, outputFile, options);
         }
     }
 });
