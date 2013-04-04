@@ -2,6 +2,24 @@ var exec = require('child_process').exec;
 
 var ImagemagickWrapper = {};
 
+ImagemagickWrapper.buildCommand = function buildCommand (inputFile, outputFile, options){
+    var key, option, result, i;
+    var inputOptions = '', outputOptions = '';
+    var i, command = '';
+
+    command = 'convert ' + inputOptions + ' ' + inputFile + ' ';
+    for (i=0; i < options.length; i+=1) {
+        option = options[i];
+        key = Object.keys(option)[0];
+
+        // Construct command line options.
+        command += ' -' + key + ' ' + '\'' + option[key] + '\'' ;
+    }
+    command += ' ' + outputFile;
+
+    return command;
+};
+
 /*
  * Process an Image.
  *
@@ -25,23 +43,16 @@ var ImagemagickWrapper = {};
  *   }
  */
 ImagemagickWrapper.process = function process (inputFile, outputFile, options){
-    var key, option, result, i;
-    var inputOptions = '', outputOptions = '';
+    var command = '';
 
     options.onError   = options.onError   || function() {};
     options.onSuccess = options.onSuccess || function() {};
 
     // Convert json options to command line options.
-    for (i=0; i < options.outputOptions.length; i+=1) {
-        option = options.outputOptions[i];
-        key = Object.keys(option)[0];
-
-        // Construct command line options.
-        outputOptions += ' -' + key + ' ' + option[key];
-    }
+    command = ImagemagickWrapper.buildCommand(inputFile, outputFile, options.outputOptions);
 
     // Execute imagemagick's convert command.
-    exec('convert ' + inputOptions + ' ' + inputFile + ' ' + outputOptions + ' ' + outputFile, function (error, stdout, stderr) {
+    exec(command, function (error, stdout, stderr) {
         if (error !== null) {
             console.log('stdout: ' + stdout);
             console.log('stderr: ' + stderr);
@@ -71,16 +82,10 @@ ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, op
     var execSync = libc.system;
 
     // Convert json options to command line options.
-    for (i=0; i < options.outputOptions.length; i+=1) {
-        option = options.outputOptions[i];
-        key = Object.keys(option)[0];
-
-        // Construct command line options.
-        outputOptions += ' -' + key + ' ' + option[key];
-    }
+    command = ImagemagickWrapper.buildCommand(inputFile, outputFile, options.outputOptions);
 
     // Execute imagemagick's convert command.
-    return execSync('convert ' + inputOptions + ' ' + inputFile + ' ' + outputOptions + ' ' + outputFile);
+    return execSync(command);
 };
 
 exports.process = ImagemagickWrapper.process;
