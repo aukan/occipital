@@ -85,7 +85,14 @@ ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, op
     command = ImagemagickWrapper.buildCommand(inputFile, outputFile, options.outputOptions);
 
     // Execute imagemagick's convert command.
-    return execSync(command);
+    statusCode = execSync(command);
+
+    if (statusCode != 0) {
+        console.log('There was an error while trying to run the following command on ImageMagick:');
+        console.log(command);
+    }
+
+    return statusCode;
 };
 
 exports.process = ImagemagickWrapper.process;
