@@ -13,7 +13,7 @@ ImagemagickWrapper.buildCommand = function buildCommand (inputFile, outputFile, 
         key = Object.keys(option)[0];
 
         // Construct command line options.
-        command += ' -' + key + ' ' + '\'' + option[key] + '\'' ;
+        command += ' -' + key + ' ' + option[key];
     }
     command += ' ' + outputFile;
 
