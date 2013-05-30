@@ -89,6 +89,9 @@ ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, op
 
     if (statusCode != 0) {
         console.log('There was an error while trying to run the following command on ImageMagick:');
+    }
+
+    if (options.debug === true || statusCode != 0) {
         console.log(command);
     }
 
