@@ -106,7 +106,7 @@ ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
 
     // Set default values.
     options           = options || {};
-    options.options   = options.options || '';
+    options.options   = options.options || [];
     options.onError   = options.onError   || function() {};
     options.onSuccess = options.onSuccess || function() {};
 
