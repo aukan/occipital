@@ -44,9 +44,6 @@ Ne.Class(Occipital, 'Lobe')({
         process : function (inputFile, outputFile, options){
             var utilityWrapper;
 
-            options.onError   = options.onError   || function() {};
-            options.onSuccess = options.onSuccess || function() {};
-
             utilityWrapper = require('./' + this.utilityWrapper + '_wrapper.js');
 
             utilityWrapper.process(inputFile, outputFile, options);
@@ -62,6 +59,17 @@ Ne.Class(Occipital, 'Lobe')({
 
             utilityWrapper = require('./' + this.utilityWrapper + '_wrapper.js');
             return utilityWrapper.processSync(inputFile, outputFile, options);
+        },
+
+        /*
+         * Obtain information about an image.
+         *
+         */
+        getImageInfo : function (imagePath, options) {
+            var utilityWrapper;
+
+            utilityWrapper = require('./' + this.utilityWrapper + '_wrapper.js');
+            utilityWrapper.getImageInfo(imagePath, options);
         }
     }
 });
