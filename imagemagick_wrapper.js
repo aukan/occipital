@@ -42,8 +42,10 @@ ImagemagickWrapper.buildCommandOptions = function buildCommandOptions (options){
 ImagemagickWrapper.process = function process (inputFile, outputFile, options){
     var command = '';
 
-    options.onError   = options.onError   || function() {};
-    options.onSuccess = options.onSuccess || function() {};
+    options.inputOptions    = options.inputOptions || [];
+    options.outputOptions   = options.outputOptions || [];
+    options.onError         = options.onError       || function() {};
+    options.onSuccess       = options.onSuccess     || function() {};
 
     // Convert json options to command line options.
     command = 'convert ' + ImagemagickWrapper.buildCommandOptions(options.inputOptions) + ' ' + inputFile + ' ' + ImagemagickWrapper.buildCommandOptions(options.outputOptions) + ' ' + outputFile;
@@ -76,6 +78,9 @@ ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, op
           "system": ["int32", ["string"]]
     });
     var execSync = libc.system;
+
+    options.inputOptions    = options.inputOptions || [];
+    options.outputOptions   = options.outputOptions || [];
 
     // Convert json options to command line options.
     command = 'convert ' + ImagemagickWrapper.buildCommandOptions(options.inputOptions) + ' ' + inputFile + ' ' + ImagemagickWrapper.buildCommandOptions(options.outputOptions) + ' ' + outputFile;
