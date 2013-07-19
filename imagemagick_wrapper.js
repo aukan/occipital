@@ -2,22 +2,19 @@ var exec = require('child_process').exec;
 
 var ImagemagickWrapper = {};
 
-ImagemagickWrapper.buildCommand = function buildCommand (inputFile, outputFile, options){
-    var key, option, result, i;
-    var inputOptions = '', outputOptions = '';
-    var i, command = '';
+ImagemagickWrapper.buildCommandOptions = function buildCommandOptions (options){
+    var key, option;
+    var i, commandOptions = '';
 
-    command = 'convert ' + inputOptions + ' ' + inputFile + ' ';
     for (i=0; i < options.length; i+=1) {
         option = options[i];
         key = Object.keys(option)[0];
 
-        // Construct command line options.
-        command += ' -' + key + ' ' + option[key];
+        // Construct command options.
+        commandOptions += ' -' + key + ' ' + option[key];
     }
-    command += ' ' + outputFile;
 
-    return command;
+    return commandOptions;
 };
 
 /*
@@ -49,7 +46,7 @@ ImagemagickWrapper.process = function process (inputFile, outputFile, options){
     options.onSuccess = options.onSuccess || function() {};
 
     // Convert json options to command line options.
-    command = ImagemagickWrapper.buildCommand(inputFile, outputFile, options.outputOptions);
+    command = 'convert ' + ImagemagickWrapper.buildCommandOptions(options.inputOptions) + ' ' + inputFile + ' ' + ImagemagickWrapper.buildCommandOptions(options.outputOptions) + ' ' + outputFile;
 
     // Execute imagemagick's convert command.
     exec(command, function (error, stdout, stderr) {
@@ -73,8 +70,7 @@ ImagemagickWrapper.process = function process (inputFile, outputFile, options){
  * Parameters: Same as process.
  */
 ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, options){
-    var key, option, result, i;
-    var inputOptions = '', outputOptions = '';
+    var command = '';
     var FFI = require("node-ffi");
     var libc = new FFI.Library(null, {
           "system": ["int32", ["string"]]
@@ -82,7 +78,7 @@ ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, op
     var execSync = libc.system;
 
     // Convert json options to command line options.
-    command = ImagemagickWrapper.buildCommand(inputFile, outputFile, options.outputOptions);
+    command = 'convert ' + ImagemagickWrapper.buildCommandOptions(options.inputOptions) + ' ' + inputFile + ' ' + ImagemagickWrapper.buildCommandOptions(options.outputOptions) + ' ' + outputFile;
 
     // Execute imagemagick's convert command.
     statusCode = execSync(command);
@@ -98,5 +94,90 @@ ImagemagickWrapper.processSync = function processSync (inputFile, outputFile, op
     return statusCode;
 };
 
+/*
+ * Get information about an image.
+ *
+ * Parameters: Path to the image and extra options if you need them.
+ */
+ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
+    var command = '';
+    var info = [];
+    var result = {};
+
+    // Set default values.
+    options           = options || {};
+    options.options   = options.options || '';
+    options.onError   = options.onError   || function() {};
+    options.onSuccess = options.onSuccess || function() {};
+
+    // Convert json options to command line options.
+    command = 'identify -format "%m %f %b %[width] %[height]"' + ImagemagickWrapper.buildCommandOptions(options.options) + ' ' + imagePath;
+
+    // Execute imagemagick's convert command.
+    exec(command, function (error, stdout, stderr) {
+        if (error !== null) {
+            console.log('stdout: ' + stdout);
+            console.log('stderr: ' + stderr);
+            console.log('exec error: ' + error);
+
+            result.stdout = stdout;
+            result.stderr = stderr;
+            result.errors = [error];
+
+            // Execute onError callback
+            options.onError.call( options.context, result );
+        }
+
+        // Extract options from stdout.
+        info = stdout.toString().replace('\n','').split(' ');
+
+        result.data = {
+            contentType : 'image/' + info[0].toLowerCase(),
+            extension   : info[0].toLowerCase(),
+            name        : info[1],
+            size        : info[2],
+            width       : info[3],
+            height      : info[4]
+        };
+
+        // Execute onSuccess callback
+        options.onSuccess.call( options.context, result );
+    });
+};
+
+// ImagemagickWrapper.getImageInfoSync = function getImageInfo (imagePath, options) {
+//     var command = '';
+//     var info = [];
+//     var result = {};
+//     var FFI = require("node-ffi");
+//     var libc = new FFI.Library(null, {
+//           "system": ["int32", ["string"]]
+//     });
+//     var execSync = libc.system;
+// 
+//     // Set default values.
+//     options           = options || {};
+//     options.options   = options.options || '';
+//     options.onError   = options.onError   || function() {};
+//     options.onSuccess = options.onSuccess || function() {};
+// 
+//     // Convert json options to command line options.
+//     command = 'identify -format "%m %f %b %[width] %[height]"' + ImagemagickWrapper.buildCommandOptions(options.options) + ' ' + imagePath;
+// 
+//     // Execute imagemagick's convert command.
+//     statusCode = execSync(command);
+//     console.log(statusCode);
+// 
+//     if (statusCode != 0) {
+//         console.log('There was an error while trying to run the following command on ImageMagick:');
+//     }
+// 
+//     if (options.debug === true || statusCode != 0) {
+//         console.log(command);
+//     }
+// };
+
 exports.process = ImagemagickWrapper.process;
 exports.processSync = ImagemagickWrapper.processSync;
+exports.getImageInfo = ImagemagickWrapper.getImageInfo;
+// exports.getImageInfoSync = ImagemagickWrapper.getImageInfo;
