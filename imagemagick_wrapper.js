@@ -131,22 +131,22 @@ ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
 
             // Execute onError callback
             options.onError.call( options.context, result );
+        } else {
+            // Extract options from stdout.
+            info = stdout.toString().replace('\n','').split(' ');
+
+            result = {
+                contentType : 'image/' + info[0].toLowerCase(),
+                extension   : info[0].toLowerCase(),
+                name        : info[1],
+                size        : info[2],
+                width       : info[3],
+                height      : info[4]
+            };
+
+            // Execute onSuccess callback
+            options.onSuccess.call( options.context, result );
         }
-
-        // Extract options from stdout.
-        info = stdout.toString().replace('\n','').split(' ');
-
-        result.data = {
-            contentType : 'image/' + info[0].toLowerCase(),
-            extension   : info[0].toLowerCase(),
-            name        : info[1],
-            size        : info[2],
-            width       : info[3],
-            height      : info[4]
-        };
-
-        // Execute onSuccess callback
-        options.onSuccess.call( options.context, result );
     });
 };
 
