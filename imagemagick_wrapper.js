@@ -116,7 +116,7 @@ ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
     options.onSuccess = options.onSuccess || function() {};
 
     // Convert json options to command line options.
-    command = 'identify -format "%m %f %b %[width] %[height]"' + ImagemagickWrapper.buildCommandOptions(options.options) + ' ' + imagePath;
+    command = 'identify -format "%f %b %[width] %[height]"' + ImagemagickWrapper.buildCommandOptions(options.options) + ' ' + imagePath;
 
     // Execute imagemagick's convert command.
     exec(command, function (error, stdout, stderr) {
@@ -137,11 +137,11 @@ ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
 
             result = {
                 contentType : 'image/' + info[0].toLowerCase(),
-                extension   : info[0].toLowerCase(),
-                name        : info[1],
-                size        : info[2],
-                width       : info[3],
-                height      : info[4]
+                extension   : info[0].match(/\.\w+$/)[0],
+                name        : info[0],
+                size        : parseInt(info[1].replace(/B/, ''), 10),
+                width       : parseInt(info[2], 10),
+                height      : parseInt(info[3], 10)
             };
 
             // Execute onSuccess callback
