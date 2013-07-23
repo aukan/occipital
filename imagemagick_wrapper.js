@@ -136,8 +136,8 @@ ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
             info = stdout.toString().replace('\n','').split(' ');
 
             result = {
-                contentType : 'image/' + info[0].toLowerCase(),
-                extension   : info[0].match(/\.\w+$/)[0],
+                contentType : 'image/' + info[0].match(/\.(\w+)$/)[1].toLowerCase(),
+                extension   : info[0].match(/\.(\w+)$/)[1],
                 name        : info[0],
                 size        : parseInt(info[1].replace(/B/, ''), 10),
                 width       : parseInt(info[2], 10),
