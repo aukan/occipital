@@ -108,6 +108,7 @@ ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
     var command = '';
     var info = [];
     var result = {};
+    var extension = null;
 
     // Set default values.
     options           = options || {};
@@ -135,9 +136,15 @@ ImagemagickWrapper.getImageInfo = function getImageInfo (imagePath, options) {
             // Extract options from stdout.
             info = stdout.toString().replace('\n','').split(' ');
 
+            if (info[0].match(/\.(\w+)$/)) {
+                extension = info[0].match(/\.(\w+)$/)[1].toLowerCase();
+            } else {
+                extension = "jpeg";
+            }
+
             result = {
-                contentType : 'image/' + info[0].match(/\.(\w+)$/)[1].toLowerCase(),
-                extension   : info[0].match(/\.(\w+)$/)[1],
+                contentType : 'image/' + extension,
+                extension   : extension,
                 name        : info[0],
                 size        : parseInt(info[1].replace(/B/, ''), 10),
                 width       : parseInt(info[2], 10),
